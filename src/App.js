@@ -240,9 +240,15 @@ function App() {
 
   // 如果沒有選擇分組，顯示分組選擇畫面
   if (!selectedGroup) {
+    // 計算所有分組的單詞總數
+    const totalWords = Object.values(groups).reduce(
+      (sum, arr) => sum + arr.length,
+      0
+    );
+
     return (
       <div className="game-container">
-        <h1>🐩 日文單字與句子記憶遊戲</h1>
+        <h1>🐩 日文單字與句子記憶遊戲 ({totalWords})</h1>
         <GroupScreen groups={groups} onSelectGroup={startGroup} />
       </div>
     );
@@ -250,8 +256,7 @@ function App() {
 
   return (
     <div className="game-container">
-      <h1>🐩 日文單字與句子記憶遊戲</h1>
-
+      <h1>🐩 日文單字與句子記憶遊戲({vocab.length})</h1>
       <GameScreen
         vocabLength={vocab.length}
         selectedGroup={selectedGroup}

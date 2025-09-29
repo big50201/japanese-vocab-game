@@ -69,8 +69,14 @@ const GameScreen = ({
         <span className="group-count">
           目前進度：
           {retryMode
-            ? `錯題複習 ${currentIndex + 1} / ${wrongCount}`
-            : `${Math.max(0, currentIndex + 1)} / ${vocabLength} 題`}
+            ? `錯題複習 ${
+                currentIndex + 1 > wrongCount ? wrongCount : currentIndex + 1
+              } / ${wrongCount}`
+            : `${
+                Math.max(0, currentIndex + 1) > vocabLength
+                  ? vocabLength
+                  : Math.max(0, currentIndex + 1)
+              } / ${vocabLength} 題`}
         </span>
         <span className="wrong-count">剩餘錯題：{wrongCount}</span>
       </div>

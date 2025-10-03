@@ -1,281 +1,101 @@
-:root {
-  --brand: #1976d2;
-  --brand-dark: #0d47a1;
-  --ink: #333;
-  --bg1: #f9f9f9;
-  --bg2: #e3f2fd;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: "Noto Sans JP", Arial, sans-serif;
-  margin: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--bg1), var(--bg2));
-  color: var(--ink);
-}
-
-h1 {
-  color: var(--brand-dark);
-  margin: 8px 0 4px;
-  text-align: center;
-}
-
-.meta {
-  color: #3866b0;
-  font-size: 14px;
-  margin: 6px 0 12px;
-}
-
-.card,
-.group-card {
-  width: 480px;
-  max-width: 92vw;
-  background: #fff;
-  border-radius: 20px;
-  padding: 26px;
-  margin: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  transition: transform 0.25s ease;
-}
-
-.card:hover,
-.group-card:hover {
-  transform: scale(1.02);
-}
-
-button {
-  padding: 10px 20px;
-  margin: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: var(--brand);
-  color: #fff;
-  transition: background 0.25s;
-}
-
-button:hover:not(:disabled) {
-  background: var(--brand-dark);
-}
-
-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-input {
-  font-size: 16px;
-  padding: 10px;
-  width: 88%;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.link {
-  font-size: 14px;
-  color: var(--brand-dark);
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-#result {
-  font-size: 16px;
-  margin-top: 12px;
-  white-space: pre-line;
-}
-
-#summary {
-  text-align: left;
-  margin-top: 16px;
-  font-size: 15px;
-}
-
-#summary details {
-  margin: 6px 0;
-}
-
-#summary button {
-  margin-top: 4px;
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-/* 分組畫面 */
-.group-screen {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
-  padding: 20px;
-}
-
-.group-card {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 200px;
-}
-
-.dog {
-  font-size: 44px;
-}
-
-.group-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--brand-dark);
-}
-
-/* Modal */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: #fff;
-  border-radius: 16px;
-  padding: 22px 24px;
-  width: 360px;
-  max-width: 90vw;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
-  text-align: left;
-}
-
-.modal h3 {
-  margin: 0 0 10px;
-  color: var(--brand-dark);
-  font-size: 18px;
-}
-
-.modal p {
-  margin: 0 0 14px;
-  white-space: pre-line;
-}
-
-.toolbar {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 480px;
-}
-
-.toolbar button {
-  padding: 6px 10px;
-  margin: 0;
-  font-size: 13px;
-}
-
-.wrong-count {
-  color: #3866b0;
-  font-size: 14px;
-}
-
-.question-content {
-  font-size: 16px;
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-.question-content b {
-  color: var(--brand-dark);
-}
-
-.question-content small {
-  display: block;
-  margin-top: 8px;
-  color: #666;
-}
-
-.answer-section {
-  margin: 16px 0;
-}
-
-.replay-section {
-  margin: 10px 0;
-  text-align: center;
-}
-
-.summary-section {
-  text-align: left;
-  margin-top: 16px;
-  font-size: 15px;
-}
-
-.summary-section details {
-  margin: 6px 0;
-  padding: 8px;
-  background: #f5f5f5;
-  border-radius: 6px;
-}
-
-.summary-section summary {
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.summary-section button {
-  margin-top: 4px;
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.input-button-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .toolbar {
-    flex-direction: column;
-    gap: 8px;
+/* 全域深色主題設定 */
+@layer base {
+  * {
+    box-sizing: border-box;
   }
 
-  .input-button-group {
-    gap: 12px;
+  html {
+    font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", -apple-system,
+      BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+      "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  body {
+    @apply bg-dark-bg text-dark-text min-h-screen;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* 深色模式下的滾動條樣式 */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dark-border rounded-lg;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
+  }
+}
+
+/* 純 Tailwind CSS 組件樣式 */
+@layer components {
+  /* 卡片基礎樣式 */
   .card {
-    padding: 20px;
+    @apply bg-dark-surface border border-dark-border rounded-xl p-6 shadow-lg backdrop-blur-sm;
+  }
+
+  /* 按鈕樣式 */
+  .btn {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg;
+  }
+
+  .btn-primary {
+    @apply btn bg-dark-accent text-white hover:bg-dark-accent-hover focus:ring-dark-accent;
+  }
+
+  .btn-secondary {
+    @apply btn bg-dark-surface text-dark-text border border-dark-border hover:bg-dark-border focus:ring-dark-border;
+  }
+
+  .btn-success {
+    @apply btn bg-dark-success text-white hover:bg-green-600 focus:ring-dark-success;
+  }
+
+  .btn-error {
+    @apply btn bg-dark-error text-white hover:bg-red-600 focus:ring-dark-error;
+  }
+
+  /* 輸入框樣式 */
+  .input {
+    @apply w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-lg text-dark-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-dark-accent focus:border-transparent transition-all duration-200;
+  }
+
+  /* 日文文字樣式 */
+  .japanese-text {
+    @apply font-japanese text-dark-text;
+  }
+}
+
+/* 工具類別 */
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow {
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+  }
+}
+
+/* 響應式字體大小 */
+@media (max-width: 640px) {
+  .japanese-text {
+    @apply text-4xl;
   }
 }

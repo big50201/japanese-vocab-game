@@ -1,3 +1,9 @@
+import { speakWithVoicevox } from "./voice.js";
+import { FirebaseTTS } from "./firebaseTTS.js";
+
+// 初始化 Firebase TTS
+const firebaseTTS = new FirebaseTTS();
+
 // 文字正規化函數
 export const normalize = (s) => (s || "").replace(/[\u3000\s]+/g, " ").trim();
 
@@ -17,11 +23,51 @@ export const isCorrect = (ans, item) => {
   return candidates.some((c) => toHira(normalize(c)) === user);
 };
 
-// 語音朗讀函數 - 改進版日文語音
-export const speak = (text) => {
+// 主要語音函數 - 多重回退策略
+export const speak = async (text) => {
+  console.log(`準備播放語音: "${text}"`);
+  // 策略 1: 優先嘗試 VOICEVOX
+  try {
+    console.log("🎌 嘗試使用 VOICEVOX TTS");
+    const success = await speakWithVoicevox(text, {
+      speaker: 1, // 四國めたん - 清晰的聲音，適合學習
+      speedScale: 0.9, // 稍慢一些，有利於學習
+      pitchScale: 0.0, // 音調調整
+      intonationScale: 1.0, // 語調強度
+    });
+
+    if (success) {
+      console.log("✅ VOICEVOX 播放成功");
+      return true;
+    } else {
+      console.log("🔄 VOICEVOX 失敗，回退到 Web Speech API");
+    }
+  } catch (error) {
+    console.error("❌ VOICEVOX 錯誤:", error);
+    console.log("🔄 回退到 Web Speech API");
+  }
+
+  // 策略 2: 回退到 Firebase Functions TTS
+  try {
+    console.log("🔥 嘗試使用 Firebase Functions TTS");
+    await firebaseTTS.speak(text, {
+      speaker: 1, // 女性標準聲音
+    });
+    console.log("✅ Firebase TTS 播放成功");
+    return true;
+  } catch (error) {
+    console.error("❌ Firebase TTS 錯誤:", error);
+    console.log("🔄 回退到 VOICEVOX");
+  }
+  // 策略 3: 最終回退到原有的 Web Speech API
+  return speakWithWebSpeech(text);
+};
+
+// 原有的 Web Speech API 實作（作為備用方案）
+const speakWithWebSpeech = (text) => {
   if (!("speechSynthesis" in window)) {
     console.warn("瀏覽器不支援語音合成");
-    return;
+    return false;
   }
 
   // 停止任何正在播放的語音
@@ -74,9 +120,9 @@ export const speak = (text) => {
     // 設定語音
     if (selectedVoice) {
       utterance.voice = selectedVoice;
-      console.log(`使用日文語音: ${selectedVoice.name}`);
+      console.log(`🔊 使用 Web Speech API 日文語音: ${selectedVoice.name}`);
     } else {
-      console.warn("未找到日文語音，使用系統預設語音");
+      console.warn("⚠️ 未找到日文語音，使用系統預設語音");
     }
 
     // 錯誤處理
@@ -85,7 +131,7 @@ export const speak = (text) => {
     };
 
     utterance.onend = () => {
-      console.log("語音播放完成");
+      console.log("✅ Web Speech API 語音播放完成");
     };
 
     // 播放語音
@@ -98,6 +144,8 @@ export const speak = (text) => {
   } else {
     setVoiceAndSpeak();
   }
+
+  return true;
 };
 
 // 停止語音播放

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase TTS 測試</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+
+      .container {
+        background: #f5f5f5;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+      }
+
+      button {
+        background: #4285f4;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      button:hover {
+        background: #3367d6;
+      }
+
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .status {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔥 Firebase Functions TTS 測試</h1>
+
+    <div class="container">
+      <h3>配置檢查</h3>
+      <div id="config-status" class="status info">
+        專案 ID: japanese-vocab-game<br />
+        Functions URL:
+        https://us-central1-japanese-vocab-game.cloudfunctions.net
+      </div>
+    </div>
+
+    <div class="container">
+      <h3>服務狀態檢查</h3>
+      <button onclick="checkHealth()">檢查健康狀態</button>
+      <button onclick="getSpeakers()">獲取說話者列表</button>
+      <div id="health-status" class="status"></div>
+    </div>
+
+    <div class="container">
+      <h3>語音測試</h3>
+      <input
+        type="text"
+        id="textInput"
+        placeholder="輸入要朗讀的日文文字"
+        value="こんにちは"
+      />
+      <br />
+      <label
+        >說話者:
+        <select id="speakerSelect">
+          <option value="1">女性聲音 1 (Standard-A)</option>
+          <option value="2">男性聲音 1 (Standard-B)</option>
+          <option value="3">女性聲音 2 (Standard-C)</option>
+          <option value="4">男性聲音 2 (Standard-D)</option>
+          <option value="5">高品質女聲 1 (Wavenet-A)</option>
+          <option value="6">高品質男聲 1 (Wavenet-B)</option>
+          <option value="7">高品質女聲 2 (Wavenet-C)</option>
+          <option value="8">高品質男聲 2 (Wavenet-D)</option>
+        </select>
+      </label>
+      <br /><br />
+      <button onclick="testSpeak()">🎤 測試語音合成</button>
+      <button onclick="testDirectAPI()">🔧 直接測試 API</button>
+      <div id="speech-status" class="status"></div>
+    </div>
+
+    <div class="container">
+      <h3>快取管理</h3>
+      <button onclick="showCache()">顯示快取</button>
+      <button onclick="clearCache()">清理快取</button>
+      <div id="cache-status" class="status"></div>
+    </div>
+
+    <script type="module">
+      // Firebase TTS 類別（簡化版本用於測試）
+      class FirebaseTTS {
+        constructor() {
+          this.baseURL =
+            "https://us-central1-japanese-vocab-game.cloudfunctions.net";
+          this.audioCache = new Map();
+          this.isServiceAvailable = false;
+        }
+
+        async checkService() {
+          try {
+            const response = await fetch(`${this.baseURL}/health`, {
+              method: "GET",
+              signal: AbortSignal.timeout(10000),
+            });
+            this.isServiceAvailable = response.ok;
+            return {
+              ok: response.ok,
+              status: response.status,
+              statusText: response.statusText,
+            };
+          } catch (error) {
+            this.isServiceAvailable = false;
+            return { ok: false, error: error.message };
+          }
+        }
+
+        async getSpeakers() {
+          try {
+            const response = await fetch(`${this.baseURL}/getSpeakers`);
+            if (response.ok) {
+              return await response.json();
+            } else {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
+          } catch (error) {
+            throw error;
+          }
+        }
+
+        async speak(text, speaker = 1) {
+          const cacheKey = `firebase_${text}_${speaker}`;
+
+          if (this.audioCache.has(cacheKey)) {
+            console.log("🎵 使用快取語音");
+            return this.playAudio(this.audioCache.get(cacheKey));
+          }
+
+          try {
+            const response = await fetch(`${this.baseURL}/speak`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text, speaker }),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(
+                `HTTP ${response.status}: ${
+                  errorData.error || response.statusText
+                }`
+              );
+            }
+
+            const audioBlob = await response.blob();
+            this.audioCache.set(cacheKey, audioBlob);
+            return this.playAudio(audioBlob);
+          } catch (error) {
+            throw error;
+          }
+        }
+
+        playAudio(audioBlob) {
+          return new Promise((resolve, reject) => {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+
+            audio.onended = () => {
+              URL.revokeObjectURL(audioUrl);
+              resolve();
+            };
+
+            audio.onerror = () => {
+              URL.revokeObjectURL(audioUrl);
+              reject(new Error("音頻播放失敗"));
+            };
+
+            audio.play().catch(reject);
+          });
+        }
+
+        getCacheInfo() {
+          return {
+            size: this.audioCache.size,
+            keys: Array.from(this.audioCache.keys()),
+          };
+        }
+
+        clearCache() {
+          this.audioCache.clear();
+        }
+      }
+
+      // 全域變數
+      window.firebaseTTS = new FirebaseTTS();
+
+      // 測試函數
+      window.checkHealth = async function () {
+        const statusDiv = document.getElementById("health-status");
+        statusDiv.textContent = "檢查中...";
+        statusDiv.className = "status info";
+
+        try {
+          const result = await window.firebaseTTS.checkService();
+          if (result.ok) {
+            statusDiv.textContent = "✅ Firebase Functions 服務正常運行";
+            statusDiv.className = "status success";
+          } else {
+            statusDiv.textContent = `❌ 服務不可用: HTTP ${result.status} - ${result.statusText}`;
+            statusDiv.className = "status error";
+          }
+        } catch (error) {
+          statusDiv.textContent = `❌ 連線錯誤: ${error.message}`;
+          statusDiv.className = "status error";
+        }
+      };
+
+      window.getSpeakers = async function () {
+        const statusDiv = document.getElementById("health-status");
+        statusDiv.textContent = "獲取說話者列表...";
+        statusDiv.className = "status info";
+
+        try {
+          const speakers = await window.firebaseTTS.getSpeakers();
+          statusDiv.innerHTML =
+            `✅ 找到 ${speakers.length} 個說話者:<br>` +
+            speakers
+              .map((s) => `${s.id}: ${s.displayName} (${s.name})`)
+              .join("<br>");
+          statusDiv.className = "status success";
+        } catch (error) {
+          statusDiv.textContent = `❌ 無法獲取說話者列表: ${error.message}`;
+          statusDiv.className = "status error";
+        }
+      };
+
+      window.testSpeak = async function () {
+        const text = document.getElementById("textInput").value;
+        const speaker = parseInt(
+          document.getElementById("speakerSelect").value
+        );
+        const statusDiv = document.getElementById("speech-status");
+
+        if (!text.trim()) {
+          statusDiv.textContent = "請輸入要朗讀的文字";
+          statusDiv.className = "status error";
+          return;
+        }
+
+        statusDiv.textContent = `🎤 正在合成語音: "${text}" (說話者: ${speaker})`;
+        statusDiv.className = "status info";
+
+        try {
+          await window.firebaseTTS.speak(text, speaker);
+          statusDiv.textContent = `✅ 語音播放完成`;
+          statusDiv.className = "status success";
+        } catch (error) {
+          statusDiv.textContent = `❌ 語音合成失敗: ${error.message}`;
+          statusDiv.className = "status error";
+        }
+      };
+
+      window.testDirectAPI = async function () {
+        const text = document.getElementById("textInput").value;
+        const speaker = parseInt(
+          document.getElementById("speakerSelect").value
+        );
+        const statusDiv = document.getElementById("speech-status");
+
+        statusDiv.textContent = "🔧 直接測試 API...";
+        statusDiv.className = "status info";
+
+        try {
+          const response = await fetch(
+            "https://us-central1-japanese-vocab-game.cloudfunctions.net/speak",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text, speaker }),
+            }
+          );
+
+          if (response.ok) {
+            const blob = await response.blob();
+            statusDiv.textContent = `✅ API 回應正常 (${blob.size} bytes)`;
+            statusDiv.className = "status success";
+
+            // 播放音頻
+            const audio = new Audio(URL.createObjectURL(blob));
+            audio.play();
+          } else {
+            const errorText = await response.text();
+            statusDiv.textContent = `❌ API 錯誤: HTTP ${response.status} - ${errorText}`;
+            statusDiv.className = "status error";
+          }
+        } catch (error) {
+          statusDiv.textContent = `❌ 網路錯誤: ${error.message}`;
+          statusDiv.className = "status error";
+        }
+      };
+
+      window.showCache = function () {
+        const cache = window.firebaseTTS.getCacheInfo();
+        const statusDiv = document.getElementById("cache-status");
+        statusDiv.innerHTML =
+          `快取大小: ${cache.size}<br>` +
+          (cache.keys.length > 0
+            ? `快取項目:<br>${cache.keys.join("<br>")}`
+            : "無快取項目");
+        statusDiv.className = "status info";
+      };
+
+      window.clearCache = function () {
+        window.firebaseTTS.clearCache();
+        const statusDiv = document.getElementById("cache-status");
+        statusDiv.textContent = "✅ 快取已清理";
+        statusDiv.className = "status success";
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOICEVOX 整合測試</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border-left: 4px solid #007acc;
+        background-color: #f8f9fa;
+      }
+      button {
+        background-color: #007acc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        font-size: 14px;
+      }
+      button:hover {
+        background-color: #005a9e;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .log {
+        background-color: #000;
+        color: #00ff00;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+      .status.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      input[type="text"] {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 200px;
+        margin: 5px;
+      }
+      select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎌 VOICEVOX 整合測試</h1>
+
+      <div class="test-section">
+        <h3>🔧 系統狀態檢查</h3>
+        <button onclick="checkSystemStatus()">檢查系統狀態</button>
+        <button onclick="checkVoicevoxEngine()">測試 VOICEVOX 引擎</button>
+        <button onclick="getSpeakers()">獲取說話者列表</button>
+        <div id="systemStatus"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>🎤 語音合成測試</h3>
+        <div>
+          <input
+            type="text"
+            id="testText"
+            value="こんにちは、世界"
+            placeholder="輸入日文文字"
+          />
+          <select id="speakerSelect">
+            <option value="1">四國めたん (清晰)</option>
+            <option value="2">ずんだもん (可愛)</option>
+            <option value="3">春日部つむぎ (溫和)</option>
+          </select>
+          <button onclick="testVoicevoxSynthesis()">合成語音</button>
+          <button onclick="testGameUtilsSpeak()">測試遊戲語音</button>
+        </div>
+        <div>
+          <label>語速: </label>
+          <input
+            type="range"
+            id="speedScale"
+            min="0.5"
+            max="2.0"
+            step="0.1"
+            value="0.9"
+          />
+          <span id="speedValue">0.9</span>
+        </div>
+        <div id="synthesisStatus"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>🎮 遊戲整合測試</h3>
+        <button onclick="testGameScenario()">測試遊戲場景</button>
+        <button onclick="testMultipleWords()">測試多個單字</button>
+        <button onclick="clearAllCaches()">清除所有快取</button>
+        <div id="gameTestStatus"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>📊 效能測試</h3>
+        <button onclick="testPerformance()">效能測試</button>
+        <button onclick="testCacheEfficiency()">快取效率測試</button>
+        <div id="performanceStatus"></div>
+      </div>
+
+      <div id="consoleLog" class="log"></div>
+    </div>
+
+    <script type="module">
+      // 重寫 console.log 以顯示在頁面上
+      const originalLog = console.log;
+      const originalError = console.error;
+      const originalWarn = console.warn;
+
+      function addLogEntry(message, type = "log") {
+        const logDiv = document.getElementById("consoleLog");
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement("div");
+        logEntry.innerHTML = `[${timestamp}] ${message}`;
+        logDiv.appendChild(logEntry);
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      console.log = function (...args) {
+        originalLog.apply(console, args);
+        addLogEntry(args.join(" "), "log");
+      };
+
+      console.error = function (...args) {
+        originalError.apply(console, args);
+        addLogEntry("❌ " + args.join(" "), "error");
+      };
+
+      console.warn = function (...args) {
+        originalWarn.apply(console, args);
+        addLogEntry("⚠️ " + args.join(" "), "warn");
+      };
+
+      // 設定環境變數 (模擬)
+      window.process = {
+        env: {
+          REACT_APP_VOICEVOX_URL:
+            "https://voicevox-engine-hxexk2zeca-de.a.run.app",
+          REACT_APP_VOICEVOX_TIMEOUT: "5000",
+          REACT_APP_VOICE_CACHE_SIZE: "50",
+          REACT_APP_TTS_PRIORITY: "voicevox,firebase,webspeech",
+        },
+      };
+
+      // 動態載入模組 (在實際專案中這些會是正常的 import)
+      let VoicevoxTTS, gameUtils, voiceManager;
+
+      try {
+        // 這裡需要你根據實際的檔案路徑調整
+        // 在實際專案中，這些會是:
+        // import VoicevoxTTS from './src/utils/voicevoxEngine.js';
+        // import { speak } from './src/utils/gameUtils.js';
+        console.log("🔄 正在載入 VOICEVOX 模組...");
+
+        // 模擬載入 - 在實際使用時需要替換為真實的 import
+        console.log("✅ 模組載入完成 (模擬)");
+        console.log("ℹ️ 在實際專案中，請確保正確 import 相關模組");
+      } catch (error) {
+        console.error("❌ 模組載入失敗:", error);
+      }
+
+      // 測試函數
+      window.checkSystemStatus = async function () {
+        const statusDiv = document.getElementById("systemStatus");
+        statusDiv.innerHTML =
+          '<div class="status info">正在檢查系統狀態...</div>';
+
+        try {
+          const status = {
+            voicevoxUrl: window.process.env.REACT_APP_VOICEVOX_URL,
+            timeout: window.process.env.REACT_APP_VOICEVOX_TIMEOUT,
+            cacheSize: window.process.env.REACT_APP_VOICE_CACHE_SIZE,
+            priority: window.process.env.REACT_APP_TTS_PRIORITY,
+          };
+
+          console.log("🔧 系統配置:", status);
+
+          statusDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>系統配置正常</strong><br>
+                        VOICEVOX URL: ${status.voicevoxUrl}<br>
+                        超時設定: ${status.timeout}ms<br>
+                        快取大小: ${status.cacheSize}<br>
+                        TTS 優先順序: ${status.priority}
+                    </div>
+                `;
+        } catch (error) {
+          console.error("系統狀態檢查失敗:", error);
+          statusDiv.innerHTML = `<div class="status error">系統狀態檢查失敗: ${error.message}</div>`;
+        }
+      };
+
+      window.checkVoicevoxEngine = async function () {
+        const statusDiv = document.getElementById("systemStatus");
+
+        try {
+          console.log("🧪 測試 VOICEVOX 引擎連接...");
+
+          const response = await fetch(
+            `${window.process.env.REACT_APP_VOICEVOX_URL}/version`,
+            {
+              method: "GET",
+              signal: AbortSignal.timeout(5000),
+            }
+          );
+
+          if (response.ok) {
+            const version = await response.text();
+            console.log(`✅ VOICEVOX 引擎連接成功 (版本: ${version})`);
+            statusDiv.innerHTML += `<div class="status success">VOICEVOX 引擎可用 (版本: ${version})</div>`;
+          } else {
+            throw new Error(`HTTP ${response.status}`);
+          }
+        } catch (error) {
+          console.error("❌ VOICEVOX 引擎連接失敗:", error);
+          statusDiv.innerHTML += `<div class="status error">VOICEVOX 引擎連接失敗: ${error.message}</div>`;
+        }
+      };
+
+      window.getSpeakers = async function () {
+        const statusDiv = document.getElementById("systemStatus");
+
+        try {
+          console.log("🗣️ 獲取說話者列表...");
+
+          const response = await fetch(
+            `${window.process.env.REACT_APP_VOICEVOX_URL}/speakers`,
+            {
+              method: "GET",
+              signal: AbortSignal.timeout(5000),
+            }
+          );
+
+          if (response.ok) {
+            const speakers = await response.json();
+            console.log(`✅ 獲取到 ${speakers.length} 個說話者`);
+
+            // 更新說話者選擇器
+            const speakerSelect = document.getElementById("speakerSelect");
+            speakerSelect.innerHTML = "";
+            speakers.slice(0, 10).forEach((speaker) => {
+              const option = document.createElement("option");
+              option.value = speaker.speaker_uuid;
+              option.textContent = `${speaker.name} (${
+                speaker.styles[0]?.name || "default"
+              })`;
+              speakerSelect.appendChild(option);
+            });
+
+            statusDiv.innerHTML += `<div class="status success">成功獲取 ${speakers.length} 個說話者</div>`;
+          } else {
+            throw new Error(`HTTP ${response.status}`);
+          }
+        } catch (error) {
+          console.error("❌ 獲取說話者列表失敗:", error);
+          statusDiv.innerHTML += `<div class="status error">獲取說話者列表失敗: ${error.message}</div>`;
+        }
+      };
+
+      window.testVoicevoxSynthesis = async function () {
+        const statusDiv = document.getElementById("synthesisStatus");
+        const text = document.getElementById("testText").value;
+        const speaker = 1; // 固定使用說話者 1
+        const speedScale = document.getElementById("speedScale").value;
+
+        if (!text.trim()) {
+          statusDiv.innerHTML =
+            '<div class="status error">請輸入要合成的文字</div>';
+          return;
+        }
+
+        statusDiv.innerHTML = '<div class="status info">正在合成語音...</div>';
+
+        try {
+          console.log(
+            `🎤 合成語音: "${text}" (說話者: ${speaker}, 語速: ${speedScale})`
+          );
+
+          // Step 1: 生成語音查詢
+          const encodedText = encodeURIComponent(text);
+          const queryResponse = await fetch(
+            `${window.process.env.REACT_APP_VOICEVOX_URL}/audio_query?text=${encodedText}&speaker=${speaker}`,
+            {
+              method: "POST",
+              signal: AbortSignal.timeout(5000),
+            }
+          );
+
+          if (!queryResponse.ok) {
+            throw new Error(`語音查詢失敗: HTTP ${queryResponse.status}`);
+          }
+
+          const audioQuery = await queryResponse.json();
+          audioQuery.speedScale = parseFloat(speedScale);
+
+          console.log("✅ 語音查詢生成成功");
+
+          // Step 2: 合成語音
+          const synthesisResponse = await fetch(
+            `${window.process.env.REACT_APP_VOICEVOX_URL}/synthesis?speaker=${speaker}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(audioQuery),
+              signal: AbortSignal.timeout(10000),
+            }
+          );
+
+          if (!synthesisResponse.ok) {
+            throw new Error(`語音合成失敗: HTTP ${synthesisResponse.status}`);
+          }
+
+          const audioBlob = await synthesisResponse.blob();
+          console.log(`✅ 語音合成成功 (${audioBlob.size} bytes)`);
+
+          // Step 3: 播放語音
+          const audioURL = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioURL);
+
+          audio.onended = () => {
+            URL.revokeObjectURL(audioURL);
+            console.log("✅ 語音播放完成");
+          };
+
+          audio.onerror = (error) => {
+            URL.revokeObjectURL(audioURL);
+            console.error("❌ 音訊播放錯誤:", error);
+          };
+
+          await audio.play();
+
+          statusDiv.innerHTML = `
+                    <div class="status success">
+                        語音合成並播放成功<br>
+                        文字: ${text}<br>
+                        檔案大小: ${audioBlob.size} bytes<br>
+                        語速: ${speedScale}
+                    </div>
+                `;
+        } catch (error) {
+          console.error("❌ 語音合成失敗:", error);
+          statusDiv.innerHTML = `<div class="status error">語音合成失敗: ${error.message}</div>`;
+        }
+      };
+
+      window.testGameUtilsSpeak = function () {
+        const statusDiv = document.getElementById("synthesisStatus");
+        statusDiv.innerHTML =
+          '<div class="status info">遊戲語音功能需要在 React 專案中測試</div>';
+        console.log("ℹ️ testGameUtilsSpeak 需要在完整的 React 專案環境中運行");
+      };
+
+      window.testGameScenario = function () {
+        const statusDiv = document.getElementById("gameTestStatus");
+        statusDiv.innerHTML =
+          '<div class="status info">遊戲場景測試需要在 React 專案中運行</div>';
+        console.log("ℹ️ 遊戲場景測試需要完整的專案環境");
+      };
+
+      window.testMultipleWords = async function () {
+        const words = [
+          "こんにちは",
+          "ありがとう",
+          "すみません",
+          "おはよう",
+          "さようなら",
+        ];
+        const statusDiv = document.getElementById("gameTestStatus");
+
+        statusDiv.innerHTML =
+          '<div class="status info">正在測試多個單字...</div>';
+
+        let successCount = 0;
+
+        for (const word of words) {
+          try {
+            console.log(`🎤 測試單字: ${word}`);
+
+            // 簡化的測試 - 只測試語音查詢
+            const encodedText = encodeURIComponent(word);
+            const response = await fetch(
+              `${window.process.env.REACT_APP_VOICEVOX_URL}/audio_query?text=${encodedText}&speaker=1`,
+              {
+                method: "POST",
+                signal: AbortSignal.timeout(3000),
+              }
+            );
+
+            if (response.ok) {
+              successCount++;
+              console.log(`✅ ${word} - 成功`);
+            } else {
+              console.log(`❌ ${word} - 失敗 (HTTP ${response.status})`);
+            }
+          } catch (error) {
+            console.error(`❌ ${word} - 錯誤:`, error.message);
+          }
+
+          // 短暫延遲避免過載
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        statusDiv.innerHTML = `
+                <div class="status ${
+                  successCount === words.length ? "success" : "error"
+                }">
+                    多單字測試完成: ${successCount}/${words.length} 成功
+                </div>
+            `;
+      };
+
+      window.clearAllCaches = function () {
+        const statusDiv = document.getElementById("gameTestStatus");
+        statusDiv.innerHTML =
+          '<div class="status info">快取清除功能需要在 React 專案中運行</div>';
+        console.log("🧹 快取清除功能需要完整的專案環境");
+      };
+
+      window.testPerformance = async function () {
+        const statusDiv = document.getElementById("performanceStatus");
+        statusDiv.innerHTML =
+          '<div class="status info">正在進行效能測試...</div>';
+
+        const startTime = performance.now();
+
+        try {
+          // 測試 API 回應時間
+          const response = await fetch(
+            `${window.process.env.REACT_APP_VOICEVOX_URL}/version`,
+            {
+              method: "GET",
+              signal: AbortSignal.timeout(5000),
+            }
+          );
+
+          const endTime = performance.now();
+          const responseTime = Math.round(endTime - startTime);
+
+          if (response.ok) {
+            console.log(`⚡ API 回應時間: ${responseTime}ms`);
+
+            statusDiv.innerHTML = `
+                        <div class="status success">
+                            效能測試完成<br>
+                            API 回應時間: ${responseTime}ms<br>
+                            狀態: ${
+                              responseTime < 1000
+                                ? "優秀"
+                                : responseTime < 3000
+                                ? "良好"
+                                : "需要優化"
+                            }
+                        </div>
+                    `;
+          } else {
+            throw new Error(`HTTP ${response.status}`);
+          }
+        } catch (error) {
+          const endTime = performance.now();
+          const responseTime = Math.round(endTime - startTime);
+
+          console.error(`❌ 效能測試失敗 (${responseTime}ms):`, error);
+          statusDiv.innerHTML = `<div class="status error">效能測試失敗: ${error.message}</div>`;
+        }
+      };
+
+      window.testCacheEfficiency = function () {
+        const statusDiv = document.getElementById("performanceStatus");
+        statusDiv.innerHTML =
+          '<div class="status info">快取效率測試需要在 React 專案中運行</div>';
+        console.log("📊 快取效率測試需要完整的專案環境");
+      };
+
+      // 初始化
+      document
+        .getElementById("speedScale")
+        .addEventListener("input", function (e) {
+          document.getElementById("speedValue").textContent = e.target.value;
+        });
+
+      // 自動檢查系統狀態
+      setTimeout(() => {
+        console.log("🚀 VOICEVOX 整合測試頁面載入完成");
+        checkSystemStatus();
+      }, 1000);
+    </script>
+  </body>
+</html>

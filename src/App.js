@@ -25,6 +25,31 @@ function App() {
   // 答案輸入狀態
   const [userAnswer, setUserAnswer] = useState("");
   const [showReplay, setShowReplay] = useState(false);
+  // 搜尋狀態
+  const [searchText, setSearchText] = useState("");
+
+  // VOICEVOX 測試狀態
+  const [voicevoxStatus, setVoicevoxStatus] = useState("未知");
+
+  useEffect(() => {
+    // 檢查 VOICEVOX 服務狀態
+    const checkVoicevoxStatus = async () => {
+      try {
+        const response = await fetch(
+          process.env.REACT_APP_VOICEVOX_URL + "/version"
+        );
+        if (response.ok) {
+          setVoicevoxStatus("可用");
+        } else {
+          setVoicevoxStatus("不可用");
+        }
+      } catch (error) {
+        setVoicevoxStatus("不可用");
+      }
+    };
+
+    checkVoicevoxStatus();
+  }, []);
 
   const inputRef = useRef(null);
 
@@ -162,7 +187,7 @@ function App() {
       setModalTitle("🎯 正確！");
       setModalBody(`完整句子：${item.sentence}`);
       setShowModal(true);
-      speak(item.sentence);
+      speak(item.sentence).catch((err) => console.error("語音播放失敗:", err));
 
       if (retryMode) {
         const newWrongList = wrongList.filter((w) => w !== item);
@@ -189,6 +214,7 @@ function App() {
           word: item.word,
           kana: item.kana,
           sentence: item.sentence,
+          sentence_zh: item.sentence_zh,
           lastWrong: "",
         };
         stat.count += 1;
@@ -202,7 +228,7 @@ function App() {
         `正確答案：${item.word}（${item.kana}）\n例句：${item.sentence}`
       );
       setShowModal(true);
-      speak(item.sentence);
+      speak(item.sentence).catch((err) => console.error("語音播放失敗:", err));
     }
   }, [currentIndex, getCurrentItem, retryMode, userAnswer, wrongList]);
 
@@ -223,7 +249,7 @@ function App() {
   const handleReplay = () => {
     const item = getCurrentItem();
     if (item) {
-      speak(item.sentence);
+      speak(item.sentence).catch((err) => console.error("語音播放失敗:", err));
     }
   };
 
@@ -246,43 +272,128 @@ function App() {
       0
     );
 
+    // 過濾分組
+    const filteredGroups = searchText
+      ? Object.keys(groups).filter((groupName) =>
+          groupName.toLowerCase().includes(searchText.toLowerCase())
+        )
+      : Object.keys(groups);
+
+    const filteredGroupsObject = filteredGroups.reduce((acc, groupName) => {
+      acc[groupName] = groups[groupName];
+      return acc;
+    }, {});
+
     return (
-      <div className="game-container">
-        <h1>🐩 日文單字與句子記憶遊戲 ({totalWords})</h1>
-        <GroupScreen groups={groups} onSelectGroup={startGroup} />
+      <div className="min-h-screen bg-dark-bg">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-dark-text mb-4 japanese-text">
+              🐩 日文單字與句子記憶遊戲
+            </h1>
+            <p className="text-base text-dark-text-secondary mb-4">
+              {Object.keys(filteredGroupsObject).length} 組共 {totalWords}
+              個單字
+            </p>
+            <p className="text-lg text-dark-text-secondary mb-4">
+              高品質音声合成で日本語を学習しよう
+            </p>
+
+            {/* VOICEVOX 狀態顯示 */}
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-surface">
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    voicevoxStatus === "可用"
+                      ? "bg-green-500"
+                      : voicevoxStatus === "不可用"
+                      ? "bg-red-500"
+                      : "bg-yellow-500"
+                  }`}
+                ></div>
+                <span className="text-sm text-dark-text-secondary">
+                  VOICEVOX TTS: {voicevoxStatus}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 搜尋列 */}
+          <div className="mb-8 max-w-md mx-auto">
+            <input
+              type="text"
+              placeholder="搜尋分組或單字..."
+              className="input w-full"
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+              }}
+            />
+          </div>
+
+          <GroupScreen
+            groups={filteredGroupsObject}
+            onSelectGroup={startGroup}
+          />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="game-container">
-      <h1>🐩 日文單字與句子記憶遊戲({vocab.length})</h1>
-      <GameScreen
-        vocabLength={vocab.length}
-        selectedGroup={selectedGroup}
-        currentItem={getCurrentItem()}
-        currentIndex={currentIndex}
-        wrongCount={wrongList.length}
-        userAnswer={userAnswer}
-        setUserAnswer={setUserAnswer}
-        onSubmitAnswer={handleSubmitAnswer}
-        onBackToGroups={backToGroups}
-        onReplay={handleReplay}
-        showReplay={showReplay}
-        retryMode={retryMode}
-        gameEnded={gameEnded}
-        wrongStats={wrongStats}
-        onRestartGroup={restartCurrentGroup}
-        inputRef={inputRef}
-        showModal={showModal}
-      />
+    <div className="min-h-screen bg-dark-bg">
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-dark-text mb-4 japanese-text">
+            🐩 日文單字與句子記憶遊戲({vocab.length})
+          </h1>
 
-      <Modal
-        show={showModal}
-        title={modalTitle}
-        body={modalBody}
-        onOk={handleModalOk}
-      />
+          {/* VOICEVOX 狀態顯示 */}
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-surface">
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  voicevoxStatus === "可用"
+                    ? "bg-green-500"
+                    : voicevoxStatus === "不可用"
+                    ? "bg-red-500"
+                    : "bg-yellow-500"
+                }`}
+              ></div>
+              <span className="text-sm text-dark-text-secondary">
+                VOICEVOX TTS: {voicevoxStatus}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <GameScreen
+          vocabLength={vocab.length}
+          selectedGroup={selectedGroup}
+          currentItem={getCurrentItem()}
+          currentIndex={currentIndex}
+          wrongCount={wrongList.length}
+          userAnswer={userAnswer}
+          setUserAnswer={setUserAnswer}
+          onSubmitAnswer={handleSubmitAnswer}
+          onBackToGroups={backToGroups}
+          onReplay={handleReplay}
+          showReplay={showReplay}
+          retryMode={retryMode}
+          gameEnded={gameEnded}
+          wrongStats={wrongStats}
+          onRestartGroup={restartCurrentGroup}
+          inputRef={inputRef}
+          showModal={showModal}
+        />
+
+        <Modal
+          show={showModal}
+          title={modalTitle}
+          body={modalBody}
+          onOk={handleModalOk}
+        />
+      </div>
     </div>
   );
 }

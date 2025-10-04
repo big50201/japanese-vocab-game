@@ -64,6 +64,22 @@ node_modules/
 
 # dotenv environment variables file
 .env
+.env.*
+!.env.example
+
+# Firebase config and debug files
+.firebase/
+firebase-debug.log*
+.firebaserc
+
+# deployment configuration
+deploy-*.sh
+!deploy-*.sh.example
+!deploy-and-test.sh
+
+# test files with sensitive information
+firebase-tts-test.html
+!firebase-tts-test.html.example
 
 # dataconnect generated files
 .dataconnect

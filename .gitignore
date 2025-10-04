@@ -80,6 +80,8 @@ deploy-*.sh
 # test files with sensitive information
 firebase-tts-test.html
 !firebase-tts-test.html.example
+voicevox-test.html
+!voicevox-test.html.example
 
 # dataconnect generated files
 .dataconnect

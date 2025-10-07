@@ -185,7 +185,12 @@ function App() {
 
     if (isCorrect(trimmedAnswer, item)) {
       setModalTitle("🎯 正確！");
-      setModalBody(`完整句子：${item.sentence}`);
+      setModalBody(
+        <>
+          <p>完整句子：{item.sentence}</p>
+          <p>中文翻譯：{item.sentence_zh}</p>
+        </>
+      );
       setShowModal(true);
       speak(item.sentence).catch((err) => console.error("語音播放失敗:", err));
 
@@ -225,7 +230,13 @@ function App() {
 
       setModalTitle("❌ 錯誤");
       setModalBody(
-        `正確答案：${item.word}（${item.kana}）\n例句：${item.sentence}`
+        <>
+          <p>
+            正確答案：{item.word}（{item.kana}）
+          </p>
+          <p>例句：{item.sentence}</p>
+          <p>中文翻譯：{item.sentence_zh}</p>
+        </>
       );
       setShowModal(true);
       speak(item.sentence).catch((err) => console.error("語音播放失敗:", err));

@@ -2,8 +2,10 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import GroupScreen from "./components/GroupScreen";
 import GameScreen from "./components/GameScreen";
 import Modal from "./components/Modal";
+import VoiceSelector from "./components/VoiceSelector";
 import { groups } from "./data/vocabulary";
 import { isCorrect, speak, stopSpeaking } from "./utils/gameUtils";
+import voicevoxTTS from "./utils/voice";
 import "./index.css";
 
 function App() {
@@ -31,24 +33,43 @@ function App() {
   // VOICEVOX 測試狀態
   const [voicevoxStatus, setVoicevoxStatus] = useState("未知");
 
-  useEffect(() => {
-    // 檢查 VOICEVOX 服務狀態
-    const checkVoicevoxStatus = async () => {
-      try {
-        const response = await fetch(
-          process.env.REACT_APP_VOICEVOX_URL + "/version"
+  // 選中的語音狀態
+  const [selectedVoice, setSelectedVoice] = useState({
+    id: 1,
+    name: "四國めたん (ノーマル)",
+  });
+
+  // 檢查 VOICEVOX 服務狀態
+  const checkVoicevoxStatus = useCallback(async () => {
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_VOICEVOX_URL + "/version"
+      );
+      if (response.ok) {
+        setVoicevoxStatus("可用");
+        // 設定初始預設說話者
+        voicevoxTTS.setDefaultSpeaker(selectedVoice.id);
+        console.log(
+          `🎭 設定初始預設說話者: ${selectedVoice.name} (ID: ${selectedVoice.id})`
         );
-        if (response.ok) {
-          setVoicevoxStatus("可用");
-        } else {
-          setVoicevoxStatus("不可用");
-        }
-      } catch (error) {
+      } else {
         setVoicevoxStatus("不可用");
       }
-    };
+    } catch (error) {
+      setVoicevoxStatus("不可用");
+    }
+  }, [selectedVoice]);
 
+  useEffect(() => {
     checkVoicevoxStatus();
+  }, []);
+
+  // 處理語音變更
+  const handleVoiceChange = useCallback((voiceId, voiceName) => {
+    setSelectedVoice({ id: voiceId, name: voiceName });
+    // 設定 voicevoxTTS 引擎的預設說話者
+    voicevoxTTS.setDefaultSpeaker(voiceId);
+    console.log(`🎭 語音已切換至: ${voiceName} (ID: ${voiceId})`);
   }, []);
 
   const inputRef = useRef(null);
@@ -310,8 +331,8 @@ function App() {
               高品質音声合成で日本語を学習しよう
             </p>
 
-            {/* VOICEVOX 狀態顯示 */}
-            <div className="mb-6">
+            {/* VOICEVOX 狀態顯示和語音選擇 */}
+            <div className="mb-6 space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-surface">
                 <div
                   className={`w-3 h-3 rounded-full ${
@@ -326,6 +347,16 @@ function App() {
                   VOICEVOX TTS: {voicevoxStatus}
                 </span>
               </div>
+
+              {/* 語音選擇器 - 只在 VOICEVOX 可用時顯示 */}
+              {voicevoxStatus === "可用" && (
+                <div className="flex justify-center">
+                  <VoiceSelector
+                    voicevoxEngine={voicevoxTTS}
+                    onVoiceChange={handleVoiceChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -359,8 +390,8 @@ function App() {
             🐩 日文單字與句子記憶遊戲({vocab.length})
           </h1>
 
-          {/* VOICEVOX 狀態顯示 */}
-          <div className="mb-6">
+          {/* VOICEVOX 狀態顯示和語音選擇 */}
+          <div className="mb-6 space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-surface">
               <div
                 className={`w-3 h-3 rounded-full ${

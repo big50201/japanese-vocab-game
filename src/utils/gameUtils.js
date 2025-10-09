@@ -30,7 +30,7 @@ export const speak = async (text) => {
   try {
     console.log("🎌 嘗試使用 VOICEVOX TTS");
     const success = await speakWithVoicevox(text, {
-      speaker: 1, // 四國めたん - 清晰的聲音，適合學習
+      // 不指定 speaker，使用語音選擇器設定的預設說話者
       speedScale: 0.9, // 稍慢一些，有利於學習
       pitchScale: 0.0, // 音調調整
       intonationScale: 1.0, // 語調強度

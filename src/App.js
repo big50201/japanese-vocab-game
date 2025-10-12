@@ -35,8 +35,8 @@ function App() {
 
   // 選中的語音狀態
   const [selectedVoice, setSelectedVoice] = useState({
-    id: 1,
-    name: "四國めたん (ノーマル)",
+    id: 0,
+    name: "四国めたん (あまあま)",
   });
 
   // 檢查 VOICEVOX 服務狀態

@@ -154,10 +154,9 @@ const GameScreen = ({
                       例句:
                     </div>
                     <div className="japanese-text text-base">
-                      {currentItem.sentence.replaceAll(
-                        currentItem.word,
-                        "____"
-                      )}
+                      {currentItem.sentence
+                        .replaceAll(currentItem.word, "____")
+                        .replaceAll(currentItem.kana, "____")}
                     </div>
                   </div>
 

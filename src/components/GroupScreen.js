@@ -17,9 +17,12 @@ const GroupScreen = ({ groups, onSelectGroup }) => {
     dogImage7,
   ];
 
+  // 反轉 groups 的 key 順序
+  const reversedGroupKeys = Object.keys(groups).reverse();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-      {Object.keys(groups).map((groupKey, index) => (
+      {reversedGroupKeys.map((groupKey, index) => (
         <div
           key={groupKey}
           className="card cursor-pointer group hover:scale-105 transition-all duration-200"

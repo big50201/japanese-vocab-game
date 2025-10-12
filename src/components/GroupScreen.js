@@ -25,20 +25,20 @@ const GroupScreen = ({ groups, onSelectGroup }) => {
       {reversedGroupKeys.map((groupKey, index) => (
         <div
           key={groupKey}
-          className="card cursor-pointer group hover:scale-105 transition-all duration-200"
+          className="bg-dark-surface backdrop-blur-sm border border-white/20 rounded-2xl p-6 cursor-pointer group hover:scale-105 transition-all duration-300 hover:bg-white/15 shadow-xl hover:shadow-indigo-500/20"
           onClick={() => onSelectGroup(groupKey)}
         >
           <div className="text-6xl mb-4 group-hover:animate-bounce">
             <img
               src={images[index % images.length]}
               alt="poddle"
-              className="w-16 h-16 mx-auto mb-2 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)] hover:drop-shadow-[0_0_15px_rgba(251,191,36,0.7)] transition-all duration-300"
+              className="w-24 h-24 mx-auto mb-2 drop-shadow-[0_0_15px_rgba(148,163,184,0.4)] group-hover:drop-shadow-[0_0_20px_rgba(199,210,254,0.6)] transition-all duration-300 transform group-hover:rotate-2"
             />
           </div>
-          <div className="text-xl font-semibold text-dark-text japanese-text text-center">
+          <div className="text-xl font-semibold text-slate-200 japanese-text text-center mt-4 group-hover:text-indigo-200 transition-colors duration-300">
             {groupKey}
           </div>
-          <div className="text-sm text-dark-text-secondary text-center mt-2">
+          <div className="text-sm text-slate-400 group-hover:text-slate-300 text-center mt-2 transition-colors duration-300">
             （{groups?.[groupKey]?.length} 個單字）
           </div>
         </div>

@@ -129,11 +129,40 @@
   .glow {
     box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
   }
+
+  /* 3D 轉換 utilities */
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
 }
 
 /* 響應式字體大小 */
 @media (max-width: 640px) {
   .japanese-text {
     @apply text-4xl;
+  }
+
+  .study-card {
+    height: 280px;
+  }
+
+  .japanese-answer {
+    font-size: 2rem;
+  }
+
+  .meaning-text {
+    font-size: 1.25rem;
+  }
+
+  .japanese-sentence {
+    font-size: 1.125rem;
   }
 }

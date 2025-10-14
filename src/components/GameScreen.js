@@ -1,5 +1,5 @@
 import React from "react";
-import { speak } from "../utils/gameUtils";
+import StudyCard from "./StudyCard";
 const GameScreen = ({
   selectedGroup,
   currentItem,
@@ -34,39 +34,14 @@ const GameScreen = ({
       return (
         <div className="mt-6 p-4 bg-dark-surface rounded-lg">
           <h3 className="text-lg font-semibold text-dark-text mb-4">
-            📝 錯題總結
+            🔄 錯題學習卡
           </h3>
-          <div className="space-y-3">
+          <p className="text-sm text-dark-text-secondary mb-4">
+            點擊卡片可以翻面查看答案，正面顯示中文意思和例句，背面顯示正確答案
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6 px-2">
             {Array.from(wrongStats.values()).map((stat, index) => (
-              <details
-                key={index}
-                className="bg-dark-bg p-3 rounded border border-dark-border"
-              >
-                <summary className="cursor-pointer text-dark-text hover:text-dark-accent text-lg font-bold">
-                  {stat.meaning} — 正解：{stat.word}（{stat.kana}）｜錯誤次數：
-                  {stat.count}
-                </summary>
-                <div className="mt-2 space-y-2 text-dark-text-secondary">
-                  {stat.lastWrong && (
-                    <div>
-                      你最後一次輸入：
-                      <span className="font-semibold text-red-400">
-                        {stat.lastWrong}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    例句：<span className="japanese-text">{stat.sentence}</span>
-                    <button
-                      className="btn-secondary px-2 py-1 text-sm"
-                      onClick={() => speak(stat.sentence)}
-                    >
-                      🔊
-                    </button>
-                  </div>
-                  <div>中文翻譯：{stat.sentence_zh}</div>
-                </div>
-              </details>
+              <StudyCard key={index} stat={stat} index={index} />
             ))}
           </div>
         </div>

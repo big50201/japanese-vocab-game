@@ -6,6 +6,7 @@ import dogImage4 from "../assets/1003-3.png";
 import dogImage5 from "../assets/1003-4.png";
 import dogImage6 from "../assets/1003-5.png";
 import dogImage7 from "../assets/1003-6.png";
+
 const GroupScreen = ({ groups, onSelectGroup }) => {
   const images = [
     dogImage,
@@ -36,7 +37,7 @@ const GroupScreen = ({ groups, onSelectGroup }) => {
             />
           </div>
           <div className="text-xl font-semibold text-slate-200 japanese-text text-center mt-4 group-hover:text-indigo-200 transition-colors duration-300">
-            {groupKey}
+            {index + 1}.{groupKey}
           </div>
           <div className="text-sm text-slate-400 group-hover:text-slate-300 text-center mt-2 transition-colors duration-300">
             （{groups?.[groupKey]?.length} 個單字）

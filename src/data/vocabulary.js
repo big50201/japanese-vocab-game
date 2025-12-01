@@ -1398,7 +1398,7 @@ export const groups = {
       word: "一尺",
       kana: "いっしゃく",
       meaning: "一尺（長度單位）",
-      sentence: "木材を一尺に切り分ける。",
+      sentence: "木材をいっしゃくに切り分ける。",
       sentence_zh: "把木材切成一尺長。",
     },
     {
@@ -1633,7 +1633,7 @@ export const groups = {
       word: "堪忍袋の緒が切れる",
       kana: "かんにんぶくろのおがきれる",
       meaning: "忍無可忍、爆發",
-      sentence: "ついに堪忍袋の緒が切れた。",
+      sentence: "ついに堪忍袋のおが切れた。",
       sentence_zh: "終於忍無可忍了。",
     },
     {
@@ -2731,6 +2731,14 @@ export const groups = {
       sentence: "傷が治癒する。",
       sentence_zh: "伤口痊愈。",
     },
+    {
+      word: "おさまる",
+      kana: "おさまる",
+      meaning:
+        "平息、平靜下來；（尺寸）放得下、裝得下；（問題）告一段落；（痛、咳等）減輕（第一類動詞）",
+      sentence: "台風が過ぎて風も雨もおさまった。",
+      sentence_zh: "颱風過後風雨都平息了。",
+    },
   ],
 
   "諸・賭・箸": [
@@ -2871,6 +2879,13 @@ export const groups = {
       meaning: "率先",
       sentence: "彼が率先して行動した。",
       sentence_zh: "他率先行動。",
+    },
+    {
+      word: "手先が器用",
+      kana: "てさきがきよう",
+      meaning: "手很靈巧、手巧（な形容詞）",
+      sentence: "彼は手先が器用で、細かい作業が得意だ。",
+      sentence_zh: "他手很靈巧，擅長細緻的作業。",
     },
     {
       word: "確率",
@@ -12732,6 +12747,34 @@ export const groups = {
       sentence: "少し成功したからといって思い上がるな。",
       sentence_zh: "別因為有點成功就自滿。",
     },
+    {
+      word: "結び付く",
+      kana: "むすびつく",
+      meaning: "相連、結合、導致（第一類動詞）",
+      sentence: "努力が成功に結び付く。",
+      sentence_zh: "努力與成功相連結。",
+    },
+    {
+      word: "受け付け",
+      kana: "うけつけ",
+      meaning: "受理；櫃檯、接待處",
+      sentence: "受け付けで用件を伝える。",
+      sentence_zh: "在櫃台說明事由。",
+    },
+    {
+      word: "備え付ける",
+      kana: "そなえつける",
+      meaning: "配備、裝設（第二類動詞）",
+      sentence: "各部屋に消火器を備え付ける。",
+      sentence_zh: "在各房間配置滅火器。",
+    },
+    {
+      word: "取り付ける",
+      kana: "とりつける",
+      meaning: "安裝；（約定等）談妥（第二類動詞）",
+      sentence: "新しいエアコンを取り付ける。",
+      sentence_zh: "安裝新冷氣。",
+    },
   ],
   "1015錯誤單字合集(形容詞)": [
     {
@@ -18731,6 +18774,27 @@ export const groups = {
       sentence_zh: "與客戶談成後，互相簽訂契約。",
     },
     {
+      word: "挨拶を交わす",
+      kana: "あいさつをかわす",
+      meaning: "互相寒暄、打招呼（第一類動詞）",
+      sentence: "近所の人と挨拶を交わす。",
+      sentence_zh: "和鄰居互相打招呼。",
+    },
+    {
+      word: "意見を交わす",
+      kana: "いけんをかわす",
+      meaning: "交換意見（第一類動詞）",
+      sentence: "会議で意見を交わす。",
+      sentence_zh: "在會議上交換意見。",
+    },
+    {
+      word: "絡める",
+      kana: "からめる",
+      meaning: "纏繞；裹上（醬汁）；牽連（第二類動詞）",
+      sentence: "パスタにソースを絡める。",
+      sentence_zh: "讓義大利麵裹上醬汁。",
+    },
+    {
       word: "取り込む",
       kana: "とりこむ",
       meaning: "收進（室內）；納入（資料）（第一類動詞）",
@@ -21220,6 +21284,48 @@ export const groups = {
       sentence: "もうこれ以上、惨めな思いをしたくない。",
       sentence_zh: "我不想再有這麼悲慘的感受了。",
     },
+    {
+      word: "容態",
+      kana: "ようだい",
+      meaning: "（病人的）病情、病況",
+      sentence: "医者が患者の容態を確認する。",
+      sentence_zh: "醫生確認病人的病情。",
+    },
+    {
+      word: "簡易",
+      kana: "かんい",
+      meaning: "簡便、簡單（な形容詞）",
+      sentence: "この手続きは簡易な方法で申請できる。",
+      sentence_zh: "這個手續可以用簡便的方法申請。",
+    },
+    {
+      word: "若々しい",
+      kana: "わかわかしい",
+      meaning: "年輕、有朝氣（い形容詞）",
+      sentence: "祖母は今でも若々しい。",
+      sentence_zh: "奶奶現在仍然很有朝氣。",
+    },
+    {
+      word: "すがすがしい",
+      kana: "すがすがしい",
+      meaning: "清新、神清氣爽（い形容詞）",
+      sentence: "早朝の空気はすがすがしい。",
+      sentence_zh: "清晨的空氣令人神清氣爽。",
+    },
+    {
+      word: "図々しい",
+      kana: "ずうずうしい",
+      meaning: "厚臉皮、厚顏無恥（い形容詞）",
+      sentence: "人の物を当然のように使うなんて図々しい。",
+      sentence_zh: "把別人的東西當成理所當然地使用，真厚臉皮。",
+    },
+    {
+      word: "みずみずしい",
+      kana: "みずみずしい",
+      meaning: "水嫩、新鮮；（表現）有朝氣（い形容詞）",
+      sentence: "みずみずしい果物を選ぶ。",
+      sentence_zh: "挑選水嫩新鮮的水果。",
+    },
   ],
   "1102錯誤単字合集（副詞・擬態語・様態）": [
     {
@@ -21603,6 +21709,34 @@ export const groups = {
       meaning: "徹底、劇烈地（改變）（副詞）",
       sentence: "雰囲気ががらっと変わった。",
       sentence_zh: "氣氛徹底改變了。",
+    },
+    {
+      word: "おどおど",
+      kana: "おどおど",
+      meaning: "畏縮不安、怯生生（副詞）",
+      sentence: "面接でおどおどしてうまく話せなかった。",
+      sentence_zh: "面試時畏縮緊張，沒能好好表達。",
+    },
+    {
+      word: "こそこそ",
+      kana: "こそこそ",
+      meaning: "偷偷地、鬼祟地（副詞）",
+      sentence: "親に内緒でこそこそ遊びに行く。",
+      sentence_zh: "瞞著父母偷偷出去玩。",
+    },
+    {
+      word: "ぐずぐず",
+      kana: "ぐずぐず",
+      meaning: "拖拖拉拉、磨蹭；嘮叨（副詞）",
+      sentence: "ぐずぐずしていると電車に間に合わないよ。",
+      sentence_zh: "再拖拖拉拉就趕不上電車了。",
+    },
+    {
+      word: "ひそひそ",
+      kana: "ひそひそ",
+      meaning: "悄悄地、小聲地、竊竊（副詞）",
+      sentence: "教室の後ろでひそひそ話すな。",
+      sentence_zh: "不要在教室後面竊竊私語。",
     },
   ],
 };

@@ -25,7 +25,8 @@
 - **樣式**：純 CSS，響應式設計
 - **語音功能**：
   - VOICEVOX TTS（主要，免費高品質日文語音）
-  - Web Speech API（備用）
+  - Firsebase TTS(備用)
+  - Web Speech API（最終備用）
 - **部署平台**：Firebase Hosting
 - **狀態管理**：React Hooks (useState, useCallback, useEffect)
 
@@ -82,29 +83,41 @@ npm run build
 
 ## 🔊 語音功能說明
 
-本應用提供兩種語音合成方案：
+本應用提供三種語音合成方案，按優先級依序為：
 
-### VOICEVOX TTS（主要，強烈推薦）
+### VOICEVOX TTS（首選，強烈推薦）
 
 - **完全免費**：無需任何費用或 API Key
 - **專業品質**：專為日文設計的高品質語音合成
 - **多角色選擇**：超過 30 個不同風格的虛擬角色聲音
-- **本地運行**：保護隱私，不依賴外部服務
 - **智能快取**：重複內容瞬間播放
+- **響應迅速**：本地或雲端服務，低延遲
 
-### Web Speech API（備用）
+### Firebase TTS（中級備選）
+
+在 VOICEVOX 不可用時自動切換到 Firebase Text-to-Speech：
+
+- **專業語音**：Google Cloud 提供的高品質日文語音
+- **穩定可靠**：雲端服務，全球可用
+- **無需額外配置**：應用已整合 Firebase，自動回退使用
+- **費用**：需要 Firebase 專案配置（超出免費額度可能產生費用）
+
+### Web Speech API（最後備選）
 
 - **免費使用**：瀏覽器內建功能，無需額外費用
 - **離線可用**：不依賴網路連接
 - **相容性佳**：支援多數現代瀏覽器
+- **即時可用**：無需任何配置
 
 **自動切換機制**：
 
-- 若 VOICEVOX 運行中，優先使用 VOICEVOX TTS
-- 若 VOICEVOX 不可用，自動回退到 Web Speech API
-- 確保語音功能始終可用
+應用會依照下列優先級自動選擇語音服務：
 
-**VOICEVOX 安裝指南**：詳見 [VOICEVOX_GUIDE.md](./VOICEVOX_GUIDE.md)
+1. **VOICEVOX TTS** - 若服務可用，優先使用
+2. **Firebase TTS** - 若 VOICEVOX 不可用，嘗試使用
+3. **Web Speech API** - 最後備選，確保始終可用
+
+確保語音功能在任何情況下都能正常運作。
 
 ## 📂 項目結構
 
